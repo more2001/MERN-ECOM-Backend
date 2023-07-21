@@ -11,6 +11,13 @@ if (process.env.NODE_ENV !== "PRODUCTION") {
   require("dotenv").config({ path: "./config/config.env" });
 }
 
+
+app.use(
+    cors({
+      origin: ["http://localhost:3000", "https://mern-ecom-site.netlify.app"],
+    })
+);
+
 app.use(
   express.json({
     limit: "10mb",
