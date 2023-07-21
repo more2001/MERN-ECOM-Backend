@@ -15,6 +15,7 @@ if (process.env.NODE_ENV !== "PRODUCTION") {
 app.use(
   cors({
     origin: ["http://localhost:3000", "https://mern-ecom-site.netlify.app"],
+    credentials: true,
   })
 );
 
