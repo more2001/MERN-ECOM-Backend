@@ -3,7 +3,6 @@ const ShippingInfo = require("../models/shipping")
 const Cart = require("../models/cart");;
 const ErrorHandler = require("../utils/errorHandler");
 const catchAsyncErrors = require("../middleware/catchAsyncErrors");
-const sendToken = require("../utils/jwtToken");
 const sendEmail = require("../utils/sendEmail");
 const crypto = require("crypto");
 const cloudinary = require("cloudinary");
@@ -32,7 +31,10 @@ exports.registerUser = catchAsyncErrors(async (req, res, next) => {
     },
   });
 
-  sendToken(user, 201, res);
+  res.status(201).json({
+    success: true,
+    token: user.getJWTToken(),
+  });
 });
 
 
@@ -57,20 +59,9 @@ exports.loginUser = catchAsyncErrors(async (req, res, next) => {
     return next(new ErrorHandler("Invalid email or password", 401));
   }
 
-  sendToken(user, 200, res);
-});
-
-
-//user logout
-exports.logoutUser = catchAsyncErrors(async (req, res, next) => {
-  res.cookie("ecom_tkn", null, {
-    expires: new Date(Date.now()),
-    httpOnly: true,
-  });
-
   res.status(200).json({
     success: true,
-    message: "User logged out successfully",
+    token: user.getJWTToken(),
   });
 });
 
@@ -144,7 +135,10 @@ exports.resetPasswordUser = catchAsyncErrors(async (req, res, next) => {
 
   await user.save();
 
-  sendToken(user, 200, res);
+  res.status(200).json({
+    success: true,
+    token: user.getJWTToken(),
+  });
 });
 
 
@@ -159,33 +153,6 @@ exports.getUserDetails = catchAsyncErrors(async (req, res, next) => {
     user,
   });
 });
-
-
-//Get LoggedIn Status
-exports.getLoggedInStatus = catchAsyncErrors(async (req, res, next) => {
-  
-  const { ecom_tkn } = req.cookies;
-  
-  if (ecom_tkn) {
-    const decodedData = jwt.verify(ecom_tkn, process.env.JWT_SECRET);
-
-    const user = await User.findById(decodedData.id);
-
-    if (user) {
-      return res.status(200).json({
-        success: true,
-        userStatus: "loggedin",
-        token: ecom_tkn
-      });
-    }
-  }
-
-  return res.status(200).json({
-    success: true,
-    userStatus: "NotLoggedin"
-  });
-});
-
 
 
 //Update Password
@@ -207,7 +174,9 @@ exports.updateUserPassword = catchAsyncErrors(async (req, res, next) =>{
   
   await user.save();
 
-  sendToken(user, 200, res)
+  res.status(200).json({
+    success: true,
+  });
   
 });
 

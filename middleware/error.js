@@ -24,7 +24,7 @@ module.exports = (err, req, res, next) => {
 
   //if JWT Token is Expired
   if (err.name === "TokenExpiredError") {
-    const message = `Authorization Token Expired, please try again`;
+    const message = `Your Session has expired! Please login !`;
     err = new ErrorHandler(message, 400);
   }
 
